@@ -63,6 +63,18 @@ function loadData() {
   }
   if (!raw) raw = {};
   if (!raw.logo) raw.logo = null;
+  raw.company = {
+    name: "STE REXROCK",
+    tagline: "Machinery and spare parts",
+    footerEmail: "Contact.rexrock@gmail.com",
+    footerAddress: "Adresse: 12 Rue Saria Ben Zounaim, Etage 3, Appt N°3 Palmier. CASABLANCA",
+    footerCapital: "Capital social: 100 000 DHS",
+    footerRC: "R.C: 693983",
+    footerPatente: "Patente: 34771826",
+    footerIce: "ICE: 003807256000032",
+    footerCnss: "CNSS: 7105793",
+    ...raw.company,
+  };
   if (!raw.docs) raw.docs = {};
   Object.keys(DOC_TYPES).forEach((t) => {
     const d = raw.docs[t];
@@ -257,6 +269,15 @@ const wordsBaseEl = document.getElementById("wordsBase");
 const logoImg = document.getElementById("logoImg");
 const logoPlaceholder = document.getElementById("logoPlaceholder");
 const logoInput = document.getElementById("logoInput");
+const companyNameEl = document.getElementById("companyNameEl");
+const companyTaglineEl = document.getElementById("companyTaglineEl");
+const footerEmailEl = document.getElementById("footerEmail");
+const footerAddressEl = document.getElementById("footerAddress");
+const footerCapitalEl = document.getElementById("footerCapital");
+const footerRCEl = document.getElementById("footerRC");
+const footerPatenteEl = document.getElementById("footerPatente");
+const footerIceEl = document.getElementById("footerIce");
+const footerCnssEl = document.getElementById("footerCnss");
 
 /* ---------------- list rendering ---------------- */
 
@@ -345,6 +366,43 @@ function renderLogo() {
   }
 }
 
+function renderCompanyInfo() {
+  const c = state.company;
+  companyNameEl.textContent = c.name;
+  companyTaglineEl.textContent = c.tagline;
+  footerEmailEl.textContent = c.footerEmail;
+  footerAddressEl.textContent = c.footerAddress;
+  footerCapitalEl.textContent = c.footerCapital;
+  footerRCEl.textContent = c.footerRC;
+  footerPatenteEl.textContent = c.footerPatente;
+  footerIceEl.textContent = c.footerIce;
+  footerCnssEl.textContent = c.footerCnss;
+}
+
+function wireCompanyField(el, key) {
+  el.addEventListener("input", () => {
+    state.company[key] = el.textContent;
+    saveData();
+  });
+  el.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      el.blur();
+    }
+  });
+}
+[
+  [companyNameEl, "name"],
+  [companyTaglineEl, "tagline"],
+  [footerEmailEl, "footerEmail"],
+  [footerAddressEl, "footerAddress"],
+  [footerCapitalEl, "footerCapital"],
+  [footerRCEl, "footerRC"],
+  [footerPatenteEl, "footerPatente"],
+  [footerIceEl, "footerIce"],
+  [footerCnssEl, "footerCnss"],
+].forEach(([el, key]) => wireCompanyField(el, key));
+
 function autoGrow(el) {
   el.style.height = "auto";
   el.style.height = el.scrollHeight + "px";
@@ -415,6 +473,7 @@ function renderTotals() {
 
 function renderModal() {
   renderLogo();
+  renderCompanyInfo();
   renderModalFields();
   renderItems();
   renderTotals();
@@ -731,3 +790,4 @@ document.addEventListener("keydown", (e) => {
 /* ---------------- init ---------------- */
 updateNavActive();
 renderList();
+renderCompanyInfo();
