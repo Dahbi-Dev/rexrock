@@ -67,6 +67,45 @@ Delivered:
 
 All changes in this session were verified with a scripted headless-Chrome harness (DevTools Protocol): filling forms, toggling options, saving/loading, and rendering both on-screen screenshots and print-to-PDF output, with page-count checks to guard against pagination overflow.
 
+## 6. Print/A4 hardening round
+Requested: taller item table closed up against the totals block, Référence column + toggle, DH currency suffixes, doc-type-specific number labels, fix borders/qté disappearing in real print PDFs (not just on-screen preview), fix cachet (signature boxes) getting hidden under the fixed footer, centered "Cachet & Signature" text.
+
+Delivered:
+- Rebuilt the item/totals tables with plain CSS (`table-layout: fixed`) instead of Tailwind utility classes — fixed a real Chromium bug where per-row `border-x` silently vanished past the first row in the paginated print/PDF pipeline (worked fine in emulated print, broke in real PDFs).
+- Switched `qte-input`/`pu-input` from `type="number"` to `type="text" inputmode="numeric"` — Chromium's real print/PDF pipeline was silently failing to render `<input type="number">` values at narrow widths.
+- Moved `#totalsSignatureBlock` to normal document flow directly under the table (out from under a `position:fixed`-to-page-bottom anchor) so a taller table closes the gap instead of leaving dead space; discovered and worked around a CSS `zoom` quirk (creates a new containing block for `position:fixed` descendants, same as `transform`) that broke the old anchor-to-page-bottom trick.
+- Moved the footer-clearance reservation (`padding-bottom` sized from the footer's real height) onto `#totalsSignatureBlock` itself so signatures no longer render underneath the fixed footer.
+- Added Référence column + `#refToggle` checkbox, N°/spec line, `DH` currency suffixes, dynamic doc-number label per type, bigger logo/company-name header block, centered "Cachet & Signature Société / Client" text.
+- All fixes verified against real generated print PDFs (`page.pdf()` rasterized with `pdftoppm`), not just on-screen/emulated print screenshots, after repeatedly finding the two diverge in Chromium.
+
+## 7. Mobile responsiveness
+Requested: make the app usable on phones without touching the printed/A4 output.
+
+Delivered:
+- All changes scoped to `@media screen and (max-width: 640px)`, print output left byte-for-byte unaffected (re-verified via PDF diff).
+- Navbar collapsed into a hamburger + dropdown menu on small screens.
+- Doc-info/client grids, totals, and signature rows stack to one column; item table becomes horizontally scrollable instead of squishing.
+- Modal action buttons reflowed into an even, tap-friendly row.
+- Verified via Playwright screenshots at a 390×844 viewport.
+
+## 8. Deployment: local service, GitHub, Windows machine, auto-pull
+Requested: install/run the app persistently on this machine and on a second (HP/Windows) machine, keep them in sync automatically.
+
+Delivered:
+- Local systemd service (`rexrock.service`, `python3 -m http.server 8123`), enabled + auto-starts on boot.
+- Pushed the project to a new public GitHub repo, `https://github.com/Dahbi-Dev/rexrock`.
+- On the HP/Windows machine (`192.168.1.6`, reachable via SSH): installed Python + Git directly (winget was unreliable), `git clone`d the repo to `C:\Apps\REXROCK`, wrapped `python.exe -m http.server 8123` as a Windows service via NSSM (auto-start, auto-restart), opened the firewall port.
+- Added a Windows Scheduled Task (`REXROCK-AutoPull`, runs as SYSTEM) that `git pull`s every 5 minutes indefinitely and logs each run to `C:\Apps\rexrock-pull.log` — keeps the HP machine in sync with GitHub with zero manual intervention. Confirmed reliable over multiple consecutive scheduled runs and a manual trigger.
+
+## 9. Editable header & footer + CNSS number
+Requested: add the company's CNSS number (7105793) to the printed footer; make the header (company name/tagline) and footer (contact/legal info) editable instead of hardcoded.
+
+Delivered:
+- Company name, tagline, and every footer field (email, address, capital, R.C., patente, ICE, and the new CNSS) are now `contenteditable` directly on the printed document — click and type, same interaction model as the other form fields.
+- Stored as a single global `state.company` object in localStorage (like the logo — shared across all document types, not per-document), saved immediately on every edit.
+- Print CSS already stripped the on-screen dashed-underline editing hint for `.print-input`-styled elements, so the printed/PDF output is unaffected by the change; verified via a rendered print PDF.
+- Pushed to GitHub and confirmed the HP machine's auto-pull task picked up the change and is serving the updated files.
+
 ## Files
 - `index.html` — structure, navbar, document list, modal/editor markup, templates.
 - `app.js` — state, French number-to-words converter, totals math, list/modal rendering, JSON export/import, event wiring.
