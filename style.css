@@ -1,0 +1,491 @@
+.nav-btn {
+  padding: 0.4rem 0.9rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  background: transparent;
+  color: #cbd5e1;
+}
+.nav-btn:hover { background: #1e293b; color: #fff; }
+.nav-btn.active { background: #f97316; color: #fff; font-weight: 600; }
+
+/* hamburger toggle + mobile dropdown menu: hidden entirely on desktop,
+   only shown/wired up under the max-width:640px block below */
+.nav-menu-toggle {
+  display: none;
+}
+.nav-menu-toggle span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.nav-menu-toggle.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav-menu-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-menu-toggle.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.nav-tabs-mobile {
+  display: none;
+}
+.nav-btn-mobile {
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.9rem;
+  background: transparent;
+  color: #cbd5e1;
+  border: none;
+}
+.nav-btn-mobile:active { background: #1e293b; }
+.nav-btn-mobile.active { background: #f97316; color: #fff; font-weight: 600; }
+
+.print-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 2px 4px;
+  border-bottom: 1px dashed #cbd5e1;
+}
+.print-input:focus {
+  border-bottom: 1px solid #f97316;
+}
+
+#print-area {
+  min-height: 950px;
+}
+
+#itemsTable.hide-ref .ref-col {
+  display: none;
+}
+
+/* ==================== INVOICE TABLE (plain CSS, no Tailwind) ==================== */
+
+.invoice-table-wrap {
+  margin-bottom: 10px;
+}
+
+.invoice-table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  border: 1px solid #000;
+}
+
+.invoice-table thead th {
+  padding: 10px;
+  line-height: 1.5;
+  vertical-align: middle;
+  border: 1px solid #000;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #000;
+  background: #fff;
+}
+
+.invoice-table tbody td {
+  padding: 6px 14px;
+  line-height: 1.3;
+  vertical-align: top;
+  color: #000;
+  border: 1px solid #000;
+}
+.invoice-table tbody tr:last-child td {
+  height: 220px;
+}
+
+.col-ref { width: 130px; }
+.ref-input { color: #94a3b8; font-size: 12px; }
+/* Référence takes width off the top, so give the price columns more of the
+   remaining share by default or "250 000,00 DH" clips. When Référence is
+   hidden (#itemsTable.hide-ref), switch to the requested 55/10/17/18. */
+.col-designation { width: 43%; text-align: left; }
+.col-qte { width: 8%; text-align: center; }
+.col-puht { width: 23%; text-align: right; white-space: nowrap; padding-left: 4px; font-size: 12.5px; }
+.col-prixht { width: 24%; text-align: right; white-space: nowrap; padding-left: 4px; font-size: 12.5px; font-weight: 600; }
+.col-action { width: 28px; padding: 0; }
+
+#itemsTable.hide-ref .col-designation { width: 52%; }
+#itemsTable.hide-ref .col-qte { width: 8%; }
+#itemsTable.hide-ref .col-puht { width: 19%; }
+#itemsTable.hide-ref .col-prixht { width: 21%; }
+
+.cell-input {
+  width: 100%;
+  color: inherit;
+  font: inherit;
+}
+textarea.cell-input {
+  resize: none;
+  overflow: hidden;
+}
+input.qte-input.cell-input {
+  text-align: center;
+}
+input.pu-input.cell-input {
+  text-align: right;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.puht-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+.dh-suffix {
+  font-size: 11px;
+  color: #000;
+  flex-shrink: 0;
+}
+
+.spec-line .spec-input {
+  font-size: 12px;
+  margin-top: -2px;
+}
+
+.del-row-btn {
+  color: #dc2626;
+  font-weight: 700;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.add-row-btn {
+  font-size: 13px;
+  color: #ea580c;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+/* ---- totals / words / signature block ---- */
+
+.totals-signature-block {
+  padding-top: 16px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.totals-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.words-box {
+  font-size: 13.5px;
+  border: 1px solid #000;
+  border-radius: 6px;
+  background: #fff;
+  padding: 8px;
+}
+.words-label {
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+.words-value {
+  font-style: italic;
+  color: #000;
+  line-height: 1.5;
+}
+
+.totals-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.totals-table td {
+  padding: 4px 10px;
+  border: 1px solid #000;
+  color: #000;
+}
+.totals-table td:last-child {
+  text-align: right;
+}
+#ttcRow td {
+  font-weight: 700;
+  padding: 6px 10px;
+}
+.remise-type-select {
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 11px;
+  margin-left: 4px;
+  padding: 1px 2px;
+}
+.remise-value-input {
+  width: 64px;
+  text-align: right;
+  margin-left: 4px;
+}
+.totals-ttc-input {
+  width: 100%;
+  text-align: right;
+  font-weight: 700;
+  color: #000;
+  background: transparent;
+  border-bottom: none;
+}
+
+.signature-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 10px;
+}
+.signature-box {
+  border: 1px solid #000;
+  border-radius: 6px;
+  height: 140px;
+  padding: 8px;
+  font-size: 13.5px;
+  color: #64748b;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: center;
+}
+
+#modalOverlay:not(.hidden) {
+  display: flex;
+}
+
+@media print {
+  body, .bg-slate-50, .bg-slate-100 {
+    background-color: #fff !important;
+  }
+  .no-print { display: none !important; }
+
+  #print-area {
+    box-shadow: none;
+    border-radius: 0;
+    margin: 0;
+    min-height: 277mm;
+  }
+  .print-input {
+    border-bottom: none;
+  }
+  .print-input:placeholder-shown {
+    display: none;
+  }
+
+  /* keep signatures intact if content ever runs long */
+  .signature-row {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* pin the footer to the physical bottom of the page: flex/min-height
+     based fill is unreliable in Chromium's paginated print layout, but
+     position:fixed is repeated at the same spot on every printed page */
+  #printFooter {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  /* totals/words/signature block stays in normal flow (not anchored to
+     the page bottom) so it always sits directly under the table with no
+     artificial gap -- growing the table pushes it down, it never leaves
+     empty space behind. It's the last element before the fixed footer,
+     so IT reserves the footer's clearance (see fitPrintAreaToPage()),
+     not #printBody. This is just a safe static fallback. */
+  #totalsSignatureBlock {
+    padding-bottom: 30mm;
+  }
+
+  /* modal chrome must not interfere with normal page flow when printing */
+  #modalOverlay {
+    position: static !important;
+    background: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+  #modalOverlay .modal-panel {
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: none !important;
+  }
+  #modalOverlay .modal-body {
+    padding: 0 !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+}
+
+/* ==================== MOBILE / PHONE (screen only -- print always stays A4) ==================== */
+@media screen and (max-width: 640px) {
+  /* navbar: swap the wrapped button row for a hamburger + dropdown menu */
+  nav > div {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    gap: 8px !important;
+  }
+  #navTabs {
+    display: none !important;
+  }
+  .nav-menu-toggle {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  .nav-tabs-mobile:not(.hidden) {
+    display: flex !important;
+    flex-direction: column;
+    padding: 8px 16px 12px;
+    border-top: 1px solid #334155;
+    background: #0f172a;
+  }
+
+  /* main list page */
+  #mainContent {
+    padding: 10px;
+  }
+  .doc-list-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .doc-list-wrap table {
+    min-width: 480px;
+  }
+
+  /* modal chrome */
+  #modalOverlay {
+    padding: 0 !important;
+  }
+  .modal-panel {
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    min-height: 100vh;
+  }
+  .modal-topbar {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .modal-topbar #modalHeading {
+    font-size: 13px;
+    width: 100%;
+  }
+  /* checkboxes + select flow first (their own wrapped row), action
+     buttons form an even, tap-friendly row below them */
+  .modal-topbar-controls {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .modal-topbar-controls label {
+    flex-shrink: 0;
+    font-size: 12px;
+    order: 1;
+  }
+  .modal-topbar-controls select {
+    flex-shrink: 0;
+    font-size: 12px;
+    padding: 4px 6px;
+    order: 1;
+  }
+  .modal-topbar-controls > button {
+    order: 2;
+    flex: 1 1 auto;
+    min-width: 84px;
+    text-align: center;
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  #btnCloseModal {
+    flex: 0 0 auto !important;
+    min-width: auto !important;
+    padding: 8px 12px !important;
+  }
+  .modal-body {
+    padding: 8px;
+  }
+  #print-area {
+    min-height: auto;
+  }
+
+  /* printable document header */
+  #printBody {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  #logoBox {
+    width: 64px;
+    height: 64px;
+  }
+  .print-header .company-name {
+    font-size: 1.35rem;
+  }
+
+  /* doc info + client boxes stack instead of side-by-side.
+     !important: Tailwind's CDN build injects its <style> tag at runtime,
+     sometimes after our stylesheet, so its .grid-cols-2 utility can win
+     the cascade tie-break on plain specificity alone. */
+  .doc-info-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* item table: keep its real (print-tuned) column widths and let the
+     user scroll sideways, instead of squishing everything unreadably */
+  .invoice-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .invoice-table {
+    min-width: 620px;
+  }
+  .invoice-table tbody tr:last-child td {
+    height: auto;
+  }
+
+  /* totals + words + signatures stack to one column */
+  .totals-signature-block {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .totals-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .signature-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .signature-box {
+    height: 100px;
+  }
+
+  /* footer */
+  #printFooter .px-8 {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}

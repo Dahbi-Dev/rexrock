@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REXROCK - Facturation</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+<!-- NAVBAR -->
+<nav class="no-print bg-slate-900 text-white sticky top-0 z-50 shadow">
+  <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-2 font-bold text-lg">
+      <span class="text-orange-400">REX</span>ROCK
+    </div>
+    <div class="flex flex-wrap gap-2" id="navTabs">
+      <button data-type="facture" class="nav-btn">Facture</button>
+      <button data-type="devis" class="nav-btn">Devis</button>
+      <button data-type="bon_commande" class="nav-btn">Bon de Commande</button>
+      <button data-type="bon_livraison" class="nav-btn">Bon de Livraison</button>
+    </div>
+    <button id="navMenuToggle" class="nav-menu-toggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div id="navTabsMobile" class="nav-tabs-mobile hidden">
+    <button data-type="facture" class="nav-btn-mobile">Facture</button>
+    <button data-type="devis" class="nav-btn-mobile">Devis</button>
+    <button data-type="bon_commande" class="nav-btn-mobile">Bon de Commande</button>
+    <button data-type="bon_livraison" class="nav-btn-mobile">Bon de Livraison</button>
+  </div>
+</nav>
+
+<div class="max-w-6xl mx-auto p-4 no-print" id="mainContent">
+
+  <!-- global toolbar -->
+  <div class="bg-white rounded-lg shadow p-4 mb-4 flex flex-wrap gap-6 items-center">
+    <div class="flex items-center gap-2">
+      <label class="text-sm font-medium text-slate-600">Logo :</label>
+      <input type="file" id="logoInput" accept="image/*" class="text-sm">
+      <button id="btnRemoveLogo" class="text-xs text-red-500 underline">retirer</button>
+    </div>
+    <div class="flex items-center gap-2">
+      <button id="btnImportJson" class="px-3 py-1.5 rounded border border-slate-300 hover:bg-slate-50 text-sm">Charger un document (JSON)</button>
+      <input type="file" id="jsonFileInput" accept="application/json,.json" class="hidden">
+    </div>
+  </div>
+
+  <!-- per-type document list -->
+  <div class="flex items-center justify-between mb-3">
+    <h1 id="listTitle" class="text-xl font-bold text-slate-800"></h1>
+    <button id="btnCreate" class="px-4 py-2 rounded bg-orange-500 hover:bg-orange-400 text-white text-sm font-semibold">+ Créer</button>
+  </div>
+  <div class="doc-list-wrap bg-white rounded-lg shadow overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-800 text-white">
+        <tr>
+          <th class="p-3 text-left">N°</th>
+          <th class="p-3 text-left">Date</th>
+          <th class="p-3 text-left">Client</th>
+          <th class="p-3 text-right">Total TTC</th>
+          <th class="p-3 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="listBody"></tbody>
+    </table>
+    <div id="listEmpty" class="p-8 text-center text-slate-400 text-sm">Aucun document. Cliquez sur "+ Créer" pour commencer.</div>
+  </div>
+</div>
+
+<!-- MODAL (create / edit) -->
+<div id="modalOverlay" class="hidden fixed inset-0 bg-black/50 z-[60] items-start justify-center overflow-y-auto py-6 px-2">
+  <div class="modal-panel bg-slate-100 rounded-lg shadow-xl w-full max-w-4xl">
+
+    <div class="no-print modal-topbar flex flex-wrap items-center justify-between gap-2 px-5 py-3 border-b bg-white rounded-t-lg sticky top-0 z-10">
+      <div class="font-semibold text-slate-700" id="modalHeading">Document</div>
+      <div class="modal-topbar-controls flex flex-wrap gap-2 items-center text-sm">
+        <label class="flex items-center gap-1 text-xs text-slate-600"><input type="checkbox" id="remiseToggle" class="w-3.5 h-3.5"> Remise</label>
+        <label class="flex items-center gap-1 text-xs text-slate-600"><input type="checkbox" id="refToggle" class="w-3.5 h-3.5" checked> Référence</label>
+        <select id="wordsBase" class="border rounded px-1 py-1 text-xs">
+          <option value="ttc">Afficher : Total TTC</option>
+          <option value="ht">Afficher : Total HT</option>
+        </select>
+        <button id="btnExportJson" class="px-2 py-1 rounded border border-slate-300 hover:bg-slate-50 text-xs">Exporter JSON</button>
+        <button id="btnPrintModal" class="px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white text-xs">Imprimer</button>
+        <button id="btnSaveDoc" class="px-3 py-1 rounded bg-orange-500 hover:bg-orange-400 text-white text-xs font-semibold">Enregistrer</button>
+        <button id="btnCloseModal" class="px-2 py-1 rounded text-slate-500 hover:text-slate-800 text-sm">&times;</button>
+      </div>
+    </div>
+
+    <div class="modal-body p-4">
+      <!-- PRINTABLE DOCUMENT -->
+      <div id="print-area" class="bg-white shadow rounded-lg overflow-hidden flex flex-col">
+       <div id="printBody" class="pt-0 px-6 pb-6 flex-1 flex flex-col">
+
+        <!-- header -->
+        <div class="print-header flex justify-between items-start border-b border-black pb-3 mb-3">
+          <div class="flex items-center gap-4">
+            <div id="logoBox" class="w-44 h-44 flex items-center justify-center overflow-hidden">
+              <img id="logoImg" src="" alt="logo" class="max-w-full max-h-full hidden">
+              <span id="logoPlaceholder" class="text-[10px] text-slate-400 text-center px-1">LOGO</span>
+            </div>
+            <div>
+              <div class="company-name text-4xl font-extrabold tracking-wide">STE REXROCK</div>
+              <div class="text-sm text-slate-500 italic">Machinery and spare parts</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- document info + client -->
+        <div class="doc-info-grid mb-3 grid grid-cols-2 gap-6">
+          <div class="border border-black rounded p-3 bg-slate-50">
+            <div class="text-sm flex gap-3 mb-2"><span id="docNumberLabel" class="text-black w-24 shrink-0">N°</span>
+              <input id="docNumber" type="text" class="print-input flex-1 min-w-0 font-semibold"></div>
+            <div class="text-sm flex gap-3"><span class="text-black w-24 shrink-0">Date</span>
+              <input id="docDate" type="text" inputmode="numeric" maxlength="10" placeholder="jj/mm/aaaa" class="print-input flex-1 min-w-0"></div>
+          </div>
+          <div class="border border-black rounded p-3">
+            <div class="text-sm flex gap-3 mb-2"><span class="text-black w-16 shrink-0">Nom</span>
+              <input id="clientName" class="print-input flex-1 min-w-0" placeholder="Nom du client"></div>
+            <div class="text-sm flex gap-3 mb-2"><span class="text-black w-16 shrink-0">Adresse</span>
+              <textarea id="clientAddress" rows="1" class="print-input flex-1 min-w-0 resize-none overflow-hidden leading-snug" placeholder="Adresse"></textarea></div>
+            <div class="text-sm flex gap-3"><span class="text-black w-16 shrink-0">ICE</span>
+              <input id="clientIce" class="print-input flex-1 min-w-0" placeholder="ICE"></div>
+          </div>
+        </div>
+
+        <!-- table -->
+        <div id="itemsTableWrap" class="invoice-table-wrap">
+          <table class="invoice-table" id="itemsTable">
+            <thead>
+              <tr>
+                <th class="ref-col col-ref">Référence</th>
+                <th class="col-designation">Désignation</th>
+                <th class="col-qte">Qté</th>
+                <th class="col-puht">Prix Unit. HT</th>
+                <th class="col-prixht">Prix HT</th>
+                <th class="col-action no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody"></tbody>
+          </table>
+        </div>
+        <button id="btnAddRow" class="no-print add-row-btn">+ Ajouter une ligne</button>
+
+       </div>
+
+        <!-- words + totals + signatures: pushed down to sit right above the footer.
+             Kept as a sibling of #printBody (not a descendant) because CSS zoom on
+             an ancestor creates a new containing block for position:fixed children,
+             which broke the "anchor to real page bottom" trick once the print-fit
+             zoom kicked in. -->
+        <div id="totalsSignatureBlock" class="totals-signature-block">
+          <div class="totals-row">
+            <div class="words-box">
+              <div class="words-label">Arrêté le présent document à la somme de :</div>
+              <div id="amountWords" class="words-value"></div>
+            </div>
+            <table class="totals-table" id="totalsTable">
+              <tr id="htRow">
+                <td id="htLabelCell">Total HT</td>
+                <td id="totalHT">0,00</td>
+              </tr>
+              <tr id="remiseRow" class="hidden">
+                <td>
+                  Remise
+                  <select id="remiseType" class="no-print remise-type-select">
+                    <option value="percent">%</option>
+                    <option value="amount">MAD</option>
+                  </select>
+                  <input id="remiseValue" type="number" min="0" value="0" class="print-input remise-value-input">
+                </td>
+                <td id="remiseAmount">0,00</td>
+              </tr>
+              <tr id="tvaRow">
+                <td>TVA (20%)</td>
+                <td id="totalTVA">0,00</td>
+              </tr>
+              <tr id="ttcRow">
+                <td>Total TTC</td>
+                <td>
+                  <input id="totalTTC" type="text" inputmode="decimal" class="print-input totals-ttc-input">
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- signatures -->
+          <div class="signature-row">
+            <div class="signature-box">Cachet &amp; Signature Société</div>
+            <div class="signature-box">Cachet &amp; Signature Client</div>
+          </div>
+        </div>
+
+        <!-- footer -->
+        <div id="printFooter" class="bg-white text-black text-sm leading-relaxed border-t border-black">
+          <div class="max-w-full px-8 py-4 flex flex-wrap justify-center gap-x-3 gap-y-1.5 text-center">
+            <a href="mailto:Contact.rexrock@gmail.com" class="text-black underline">Contact.rexrock@gmail.com</a><span class="text-black">•</span>
+            <span>Adresse: 12 Rue Saria Ben Zounaim, Etage 3, Appt N°3 Palmier. CASABLANCA</span><span class="text-black">•</span>
+            <span>Capital social: 100 000 DHS</span><span class="text-black">•</span>
+            <span>R.C: 693983</span><span class="text-black">•</span>
+            <span>Patente: 34771826</span><span class="text-black">•</span>
+            <span>ICE: 003807256000032</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<template id="rowTemplate">
+  <tr>
+    <td class="ref-col col-ref"><input class="print-input cell-input ref-input"></td>
+    <td class="col-designation">
+      <textarea rows="1" class="print-input cell-input designation-input"></textarea>
+      <div class="spec-line">
+        <textarea rows="1" class="print-input cell-input spec-input" placeholder="N° série, spécification..."></textarea>
+      </div>
+    </td>
+    <td class="col-qte"><input type="text" inputmode="numeric" value="1" class="print-input cell-input qte-input"></td>
+    <td class="col-puht">
+      <div class="puht-cell">
+        <input type="text" inputmode="decimal" value="0,00" class="print-input cell-input pu-input">
+        <span class="dh-suffix">DH</span>
+      </div>
+    </td>
+    <td class="col-prixht montant-cell">0,00 DH</td>
+    <td class="col-action no-print"><button class="del-row-btn del-row">&times;</button></td>
+  </tr>
+</template>
+
+<template id="listRowTemplate">
+  <tr class="border-b border-slate-100 hover:bg-slate-50">
+    <td class="p-3 font-medium doc-number"></td>
+    <td class="p-3 doc-date"></td>
+    <td class="p-3 doc-client"></td>
+    <td class="p-3 text-right doc-ttc"></td>
+    <td class="p-3 text-center whitespace-nowrap">
+      <button class="text-blue-600 hover:underline text-xs mr-3 btn-edit">Modifier</button>
+      <button class="text-slate-700 hover:underline text-xs mr-3 btn-print">Imprimer</button>
+      <button class="text-red-500 hover:underline text-xs btn-delete">Supprimer</button>
+    </td>
+  </tr>
+</template>
+
+<script src="app.js"></script>
+</body>
+</html>
